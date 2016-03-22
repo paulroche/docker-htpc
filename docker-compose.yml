@@ -1,0 +1,47 @@
+---
+version: '2'
+services:
+  sabnzbd:
+    env_file: ~/github/paulroche/docker-sabnzbd/vars
+    build: ~/github/paulroche/docker-sabnzbd
+    image: 'paulroche/sabnzbd'
+    container_name: sabnzbd
+    cpuset: "0"
+    restart: always
+    expose:
+      - "8080"
+    ports:
+      - "9090:9090"
+    volumes:
+      - '/mediabox:/mediabox'
+  sickbeard:
+    depends_on:
+      - sabnzbd
+    links:
+      - sabnzbd
+    env_file: ~/github/paulroche/docker-sickbeard/vars
+    build: ~/github/paulroche/docker-sickbeard
+    image: 'paulroche/sickbeard'
+    container_name: sickbeard
+    cpuset: "0"
+    restart: always
+    ports: 
+      - "8081:8081"
+    volumes:
+      - '/data/sickbeard:/data/sickbeard'
+      - '/mediabox:/mediabox'
+  couchpotato:
+    depends_on:
+      - sabnzbd
+    links:
+      - sabnzbd
+    env_file: ~/github/paulroche/docker-couchpotato/vars
+    build: ~/github/paulroche/docker-couchpotato
+    image: 'paulroche/couchpotato'
+    container_name: couchpotato
+    cpuset: "0"
+    restart: always
+    ports:
+      - "5050:5050"
+    volumes:
+      - '/data/couchpotato:/data/couchpotato'
